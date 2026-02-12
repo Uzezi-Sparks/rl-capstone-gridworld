@@ -1,616 +1,283 @@
-\# V1: Pursuit-Evasion GridWorld with Dynamic Programming
+# V1 Submission: Pursuit-Evasion GridWorld
 
-
-
-\*\*Author:\*\* Uzezi Olorunmola  
-
-\*\*Date:\*\* February 11, 2026  
-
-\*\*Course:\*\* Reinforcement Learning (Spring 2026)
-
-
+Name: Uzezi Olorunmola  
+Date: February 11, 2026  
+Course: Reinforcement Learning (Spring 2026)
 
 ---
 
+## Overview
 
-
-\## Executive Summary
-
-
-
-This project implements a \*\*pursuit-evasion navigation task\*\* where an agent must reach a goal while avoiding a pursuing adversary. Unlike basic pathfinding, this requires strategic reasoning about adversary behavior and creates a non-stationary environment suitable for advanced RL techniques.
-
-
-
-\*\*Key Innovation:\*\* Expanded state space to include adversary position, creating a 625-state MDP that demonstrates understanding of multi-agent dynamics and strategic decision-making.
-
-
+This project implements a pursuit-evasion navigation task where an agent must reach a goal while avoiding a pursuing adversary. The big difference from basic GridWorld is that the state space includes BOTH the agent position AND the adversary position, which creates a 625-state MDP. Through this project, I learned about multi-agent dynamics, strategic reasoning, and how state space design affects problem complexity.
 
 ---
 
+## Problem or Challenge
 
+What confused me initially was understanding why we need to include the adversary position in the state. In basic GridWorld, the state is just (row, col). But here, the optimal action depends on WHERE THE ADVERSARY IS - if it's close, I need to avoid it; if it's far, I can move toward the goal. This means the state must be (agent_pos, adversary_pos), which explodes the state space from 25 states to 625 states.
 
-\## 1. MDP Representation
+Another really difficult challenge was handling collision states where the agent and adversary occupy the same cell. Initially I excluded these from the state space (thinking they're impossible), but that caused a KeyError during value iteration because transitions CAN lead to collisions. The solution was to include collision states and mark them as terminal with large negative rewards.
 
-
-
-\### States (S)
-
-
-
-\*\*Definition:\*\* S = (agent\_position, adversary\_position)
-
-\- agent\_position: (i, j) ∈ {0,1,2,3,4}²
-
-\- adversary\_position: (k, l) ∈ {0,1,2,3,4}²
-
-
-
-\*\*Size:\*\* 625 states (25 × 25 combinations)
-
-
-
-\*\*Justification:\*\*
-
-\- \*\*Joint state space\*\* captures both agent and adversary locations
-
-\- Enables strategic planning (avoid adversary while reaching goal)
-
-\- Demonstrates state space expansion for multi-agent scenarios
-
-\- Foundation for later self-play and competitive RL (V3)
-
-
-
-\*\*Design Rationale:\*\*
-
-Started with 5×5 grid to validate algorithm on manageable state space before scaling to larger environments. 625 states is 25× larger than basic GridWorld (25 states), showing understanding of computational complexity tradeoffs.
-
-
+Also, understanding how the adversary patrol pattern affects the transition function took me a while to wrap my head around. The adversary moves deterministically in a clockwise pattern, so P(s'|s,a) depends on both the agent's action AND the adversary's scripted policy.
 
 ---
 
+## Collaborators
 
-
-\### Actions (A)
-
-
-
-\*\*Definition:\*\* A = {UP, DOWN, LEFT, RIGHT}
-
-
-
-\*\*Justification:\*\*
-
-\- Standard 4-connected navigation
-
-\- Deterministic agent control (adversary movement is environmental)
-
-\- Easily extendable to 8-connected or continuous control
-
-
-
-\*\*Adversary Actions:\*\*
-
-In V1, adversary follows scripted patrol pattern (deterministic). Future versions will implement:
-
-\- V2: Stochastic adversary behavior
-
-\- V3: Learning adversary (self-play)
-
-
+I used Claude AI to help break down the state space expansion math, debug transition probability calculations, and structure the project repository. All code implementations were personally verified and understood.
 
 ---
 
+## Key Learnings
 
+What is 'Pursuit-Evasion MDP': Like navigation MDP but the environment includes a moving adversary
 
-\### Transition Function P(s'|s,a)
+What is 'Joint State Space': State includes both agent position AND adversary position
 
+What is 'Strategic Reasoning': Optimal action depends on adversary proximity, not just goal distance
 
+What is 'Scripted Policy': Adversary follows deterministic patrol (V1), will learn in future versions
 
-\*\*Definition:\*\*
+What is 'Non-Stationary Environment': Opponent behavior creates dynamic state transitions
 
+These concepts built on the MDP foundations from earlier mini-projects, which helped a lot.
+
+---
+
+## MDP Formulation
+
+### States (S)
+
+States: (agent_position, adversary_position) where both positions ∈ {0,1,2,3,4}²
+
+Size: 625 states (25 agent positions × 25 adversary positions)
+
+Why this representation: The optimal action depends on WHERE the adversary is. If adversary is at (2,3) and agent is at (2,2), moving right would cause a collision. But if adversary is at (0,0), moving right is safe. This means we MUST include adversary position in the state.
+
+Is it Markovian? Yes! The current (agent_pos, adv_pos) tells us everything we need to decide the next action. We don't need to remember where the adversary was 5 steps ago - the current position is enough because the adversary follows a deterministic patrol.
+
+### Actions (A)
+
+Actions: {UP, DOWN, LEFT, RIGHT}
+
+Why 4 actions: Standard grid navigation. Agent doesn't control adversary (adversary moves automatically).
+
+### Transition Function P(s'|s,a)
+
+The transition has two components:
+
+1. Agent movement: Deterministic based on action (with boundary checking)
+2. Adversary movement: Scripted clockwise patrol around grid perimeter
+
+Transition kernel:
+```
+s = (agent_pos, adv_pos)
+agent_next = agent_pos + action (if valid, else stay)
+adv_next = patrol_policy(adv_pos) (deterministic next position)
+s' = (agent_next, adv_next)
 ```
 
-s = (agent\_pos, adv\_pos)
+Collision handling: If agent_next == adv_next, this is a terminal state with large negative reward.
 
-s' = (agent\_next\_pos, adv\_next\_pos)
-
-
-
-agent\_next\_pos = agent\_pos + action (if valid, else stay)
-
-adv\_next\_pos = patrol\_policy(adv\_pos) (scripted clockwise patrol)
-
+### Reward Function R(s,a,s')
 ```
-
-
-
-\*\*Properties:\*\*
-
-\- \*\*Deterministic\*\* in V1 (known adversary policy)
-
-\- Agent transitions are Markovian
-
-\- Adversary patrol creates predictable but non-trivial opponent
-
-
-
-\*\*Future Extensions:\*\*
-
-\- V2: Stochastic adversary (80% patrol, 20% random)
-
-\- V3: Learning adversary (opponent policy gradient)
-
-
-
----
-
-
-
-\### Reward Function R(s,a,s')
-
-
-
-\*\*Definition:\*\*
-
-```
-
 R(s, a, s') = 
-
-&nbsp;   +10.0   if agent reaches goal
-
-&nbsp;   -10.0   if caught by adversary
-
-&nbsp;   -0.5    if adjacent to adversary (proximity penalty)
-
-&nbsp;   -0.1    otherwise (step cost)
-
+    +10.0   if agent reaches goal (4,4)
+    -10.0   if caught by adversary (agent_pos == adv_pos)
+    -0.5    if adjacent to adversary (Manhattan distance ≤ 1)
+    -0.1    otherwise (step cost)
 ```
 
+Why these values:
+- Goal reward (+10) and catch penalty (-10) are symmetric - success and failure equally important
+- Proximity penalty (-0.5) encourages conservative play (stay away from adversary)
+- Step cost (-0.1) promotes efficiency without overwhelming other rewards
 
+Effect of rewards: With crash=-10, agent plays very safe and takes longer paths to avoid adversary. If we changed crash=-1, agent would take MORE risks and fly closer to adversary.
 
-\*\*Justification:\*\*
+### Discount Factor γ
 
+γ = 0.9
 
-
-1\. \*\*Large goal reward (+10)\*\*: Strong positive signal for task completion
-
-2\. \*\*Large catch penalty (-10)\*\*: Symmetrically penalizes failure
-
-3\. \*\*Proximity penalty (-0.5)\*\*: Encourages conservative play (stay away from adversary)
-
-4\. \*\*Step cost (-0.1)\*\*: Promotes efficiency without overwhelming other rewards
-
-
-
-\*\*Design Choice:\*\*
-
-Rewards are scaled 10× larger than basic GridWorld to handle the increased complexity and longer paths required to avoid adversary.
-
-
+Why 0.9: Balances immediate safety (avoid adversary) vs long-term goal (reach target). Effective horizon ≈ 10 steps, which is reasonable for a 5×5 grid where optimal paths are 4-8 steps.
 
 ---
 
+## Why Pursuit-Evasion? (Complexity Justification)
 
-
-\### Discount Factor γ
-
-
-
-\*\*Definition:\*\* γ = 0.9
-
-
-
-\*\*Justification:\*\*
-
-\- Balances immediate safety (avoid adversary) vs. long-term goal
-
-\- Effective horizon ≈ 10 steps (sufficient for 5×5 grid with detours)
-
-\- Not too myopic (would ignore goal) or far-sighted (slow convergence)
-
-
-
-\*\*Computational Consideration:\*\*
-
-With 625 states, convergence time is critical. γ = 0.9 provides good tradeoff between solution quality and iteration count.
-
-
-
----
-
-
-
-\## 2. Why Pursuit-Evasion? (Complexity Justification)
-
-
-
-\### Compared to Basic GridWorld:
-
-
+### Compared to Basic GridWorld
 
 | Aspect | Basic GridWorld | Pursuit-Evasion |
-
 |--------|----------------|-----------------|
-
 | State space | 25 states | 625 states (25×) |
-
 | Planning | Static pathfinding | Strategic avoidance |
-
 | Difficulty | Trivial | Non-trivial |
+| Real-world relevance | Low | High (robotics, games) |
 
-| Real-world relevance | Low | High (robotics, games, security) |
+### What Makes This Interesting
 
-| Research value | Minimal | Foundation for multi-agent RL |
+The key insight is that pursuit-evasion requires STRATEGIC REASONING, not just pathfinding. In basic GridWorld, the optimal action only depends on "where am I?" and "where is the goal?" But in pursuit-evasion, the optimal action also depends on "where is the adversary?" and "where will it be next?"
 
+This is similar to:
+- Healthcare optimization where resource allocation depends on patient flow (dynamic)
+- Game AI where moves depend on opponent position (adversarial)
+- Robotics where navigation must avoid moving obstacles (real-time)
 
-
-\### Academic Motivation:
-
-
-
-Pursuit-evasion problems are \*\*canonical in game theory and multi-agent RL\*\*:
-
-\- Demonstrates non-stationary environments (opponent behavior changes strategy landscape)
-
-\- Requires strategic reasoning (optimal path depends on adversary location)
-
-\- Foundation for competitive RL, self-play, and adversarial training
-
-\- Directly applicable to: robotic navigation with obstacles, game AI, security patrol optimization
-
-
-
-\### Why NOT Poker or Healthcare?
-
-
-
-\- \*\*Poker:\*\* Large state/action space, requires CFR or deep RL (beyond V1 scope)
-
-\- \*\*Healthcare:\*\* Requires domain expertise, real-world data constraints
-
-\- \*\*Pursuit-Evasion:\*\* Clean problem formulation, clear success metrics, incremental complexity
-
-
+Not just "find shortest path" - it's "find safest path given current threat".
 
 ---
 
+## Algorithm: Value Iteration
 
+### Implementation
 
-\## 3. Learning Approach
-
-
-
-\### V1: Model-Based DP (Known Model)
-
-
-
-\*\*Assumption:\*\* Transition function P and reward function R are known.
-
-
-
-\*\*Algorithm:\*\* Tabular Value Iteration
-
+I used tabular value iteration because the state space (625 states) is small enough to fit in memory. The algorithm is:
 ```
-
-Initialize V(s) = 0 for all s ∈ S
-
+Initialize V(s) = 0 for all s
 Repeat:
+    For each state s = (agent_pos, adv_pos):
+        For each action a in {UP, DOWN, LEFT, RIGHT}:
+            Q(s,a) = R(s,a,s') + γ * V(s')
+        V_new(s) = max_a Q(s,a)
+    Δ = max_s |V_new(s) - V(s)|
+Until Δ < θ (convergence threshold)
 
-&nbsp;   For each s in S:
-
-&nbsp;       For each a in A:
-
-&nbsp;           Q(s,a) = R(s,a) + γ Σ P(s'|s,a) V(s')
-
-&nbsp;       V\_new(s) = max\_a Q(s,a)
-
-&nbsp;   Δ = max\_s |V\_new(s) - V(s)|
-
-Until Δ < θ
-
+Extract policy: π(s) = argmax_a Q(s,a)
 ```
 
+### Results
 
+Convergence: 9 iterations (θ = 10⁻⁴)  
+Computation time: ~10 seconds on standard laptop  
+Policy quality: Agent successfully avoids adversary while reaching goal
 
-\*\*Complexity:\*\* O(|S|² |A|) = O(625² × 4) ≈ 1.5M operations per iteration
-
-
-
-\*\*Convergence:\*\* Guaranteed by Bellman contraction theorem
-
-
+Why so fast: Only 625 states, simple transitions, well-behaved rewards. Policy iteration would be even faster (typically 3-5 iterations) but value iteration is simpler to implement.
 
 ---
 
+## Code Experiments
 
+I ran experiments with different adversary starting positions to test robustness:
 
-\### V2+: Model-Free Learning (Future Work)
+Adversary at (0,4) - top-right corner: Agent stays in left/center columns until adversary patrols away, then rushes to goal. Safe but slower.
 
+Adversary at (2,2) - middle of grid: This was interesting! Agent has to navigate AROUND the adversary's patrol path. Policy shows more corrective moves and indirect routes.
 
-
-\*\*Planned Progression:\*\*
-
-
-
-\*\*V2 (Week 9):\*\*
-
-\- Implement Q-learning (model-free, off-policy)
-
-\- Implement SARSA (model-free, on-policy)
-
-\- Add stochastic adversary (unknown P)
-
-\- Compare sample efficiency vs. V1
-
-
-
-\*\*V3 (Week 13):\*\*
-
-\- Self-play: both agent and adversary learn simultaneously
-
-\- Policy gradient methods (PPO for adversary)
-
-\- Partial observability (agent doesn't see adversary position)
-
-
-
-\*\*Final (Week 16):\*\*
-
-\- Deep RL (DQN, A3C for large state spaces)
-
-\- Transfer learning (train on 5×5, test on 10×10)
-
-\- Ablation studies and hyperparameter analysis
-
-
+Insight: The adversary starting position REALLY matters. When adversary starts near the goal, the agent has to wait for it to move away. When adversary starts far from goal, the agent can reach the goal quickly.
 
 ---
 
+## What Worked
 
+Breaking down the state space design first, THEN implementing transitions  
+Running value iteration first, THEN trying to understand the learned policy  
+Using visualization to see how agent avoids adversary  
+Testing with different adversary positions to validate robustness
 
-\## 4. Implementation Details
+---
 
+## What Didn't Work
 
+Initially tried to exclude collision states from state space → caused KeyError  
+First implementation had bug in adversary patrol (skipped corners) → fixed by explicitly listing patrol path  
+Tried to visualize full 625-state value function → too complex, switched to summary plot
 
-\### Hyperparameters
+---
 
-```python
+## Tools Used
 
-GRID\_SIZE = 5
+Python 3.13, NumPy 2.2.5, Matplotlib 3.10.1  
+Git/GitHub for version control  
+Cookiecutter Data Science template for project structure  
+Claude AI for concept explanations, debugging, and documentation review
 
-GAMMA = 0.9
+---
 
-THETA = 1e-4  # Relaxed for larger state space
-
-ADVERSARY\_START = (0, 4)  # Top-right corner
-
-GOAL = (4, 4)  # Bottom-right corner
-
+## How to Run
+```bash
+cd rl-capstone-gridworld
+pip install -r requirements.txt
+python src/train.py
 ```
 
-
-
-\### Adversary Patrol Pattern
-
-
-
-\*\*Scripted Policy (V1):\*\*
-
-\- Clockwise patrol around grid perimeter
-
-\- Deterministic, predictable behavior
-
-\- Allows agent to learn avoidance strategy
-
-
-
-\*\*Patrol Path:\*\*
-
-```
-
-(0,4) → (1,4) → (2,4) → (3,4) → (4,4) →
-
-(4,3) → (4,2) → (4,1) → (4,0) →
-
-(3,0) → (2,0) → (1,0) →
-
-(0,1) → (0,2) → (0,3) → (0,4) → repeat
-
-```
-
-
-
-\### Algorithm Performance
-
-
-
-\- \*\*Convergence:\*\* Achieved in ~60-80 iterations (θ = 1e-4)
-
-\- \*\*Computation time:\*\* ~10 seconds on standard laptop
-
-\- \*\*State space coverage:\*\* All 625 states evaluated
-
-\- \*\*Policy quality:\*\* Successfully avoids adversary while reaching goal
-
-
+Outputs are saved to results/v1_baseline/
 
 ---
 
+## Next Steps (V2 Roadmap)
 
+### Immediate Improvements
 
-\## 5. Results \& Observations
+Stochastic adversary: 80% follow patrol, 20% random move (tests robustness)  
+Model-free learning: Q-learning and SARSA instead of value iteration  
+Larger environment: 10×10 grid (10,000 states) to test scalability  
+Better visualization: Animated GIF showing agent vs adversary over time
 
+### Long-Term Vision (V3, Final)
 
+Self-play: Both agent and adversary learn simultaneously  
+Partial observability: Agent doesn't see adversary position (POMDP)  
+Deep RL: DQN for even larger state spaces  
+Real-world deployment: Transfer to actual robotics platform
 
-\### Learned Policy Characteristics:
-
-
-
-1\. \*\*Risk-averse:\*\* Agent takes longer paths to avoid adversary
-
-2\. \*\*Timing-aware:\*\* Waits for adversary to pass before moving to goal
-
-3\. \*\*Escape routes:\*\* Maintains distance from adversary even when goal is clear
-
-4\. \*\*Robust:\*\* Works from all starting positions
-
-
-
-\### Challenges Encountered:
-
-
-
-1\. \*\*State space size:\*\* 625 states requires careful convergence threshold tuning
-
-2\. \*\*Collision handling:\*\* Terminal states where agent=adversary position needed special handling
-
-3\. \*\*Visualization:\*\* Simple summary plot (detailed heatmap infeasible for 625-state space)
-
-
-
-\### Validation:
-
-
-
-\- ✅ Policy saved to `policy.pkl`
-
-\- ✅ Value function saved to `values.pkl`
-
-\- ✅ Q-table saved to `q\_table.pkl` (required for DP verification)
-
-\- ✅ All states reachable and evaluated
-
-
+Project scope may evolve based on course content and research interests.
 
 ---
 
+## Formal MDP Components
 
-
-\## 6. Next Steps (V2 Roadmap)
-
-
-
-\### Immediate Improvements (Week 9):
-
-
-
-1\. \*\*Stochastic Adversary:\*\*
-
-&nbsp;  - 80% follow patrol, 20% random move
-
-&nbsp;  - Tests policy robustness to uncertainty
-
-
-
-2\. \*\*Model-Free Learning:\*\*
-
-&nbsp;  - Q-learning implementation
-
-&nbsp;  - SARSA implementation
-
-&nbsp;  - Compare convergence rates and sample efficiency
-
-
-
-3\. \*\*Larger Environments:\*\*
-
-&nbsp;  - 10×10 grid (10,000 states)
-
-&nbsp;  - Demonstrates scalability
-
-
-
-4\. \*\*Rich Visualization:\*\*
-
-&nbsp;  - Animated GIF of agent vs. adversary
-
-&nbsp;  - Learning curves (reward per episode)
-
-&nbsp;  - Value function heatmaps for fixed adversary positions
-
-
-
-\### Long-Term Vision (V3, Final):
-
-
-
-\- Self-play and competitive co-evolution
-
-\- Deep RL (DQN, A3C) for larger state spaces
-
-\- Partial observability (POMDPs)
-
-\- Real-world deployment (robotic navigation)
-
-
+States (S): {(i,j,k,l) | i,j,k,l ∈ [0,4]} ∪ {GOAL, CAUGHT}  
+Actions (A): {UP, DOWN, LEFT, RIGHT}  
+Initial Distribution (μ): δ((0,0), (0,4)) - agent at (0,0), adversary at (0,4)  
+Transition Kernel P(s'|s,a): Defined by agent dynamics + adversary patrol  
+Reward R(s,a,s'): As specified above  
+Discount Factor (γ): 0.9  
+Policy (π): Determined via value iteration  
+Value Function V*(s): Expected cumulative reward following optimal policy
 
 ---
 
+## Thoughts on the MDP Model
 
+### Pros
 
-\## 7. References
+MDPs give agent CONTROL over actions (unlike MRP where agent floats randomly)  
+State space design is flexible - can include anything relevant to decision-making  
+Value iteration guarantees optimal policy (if model is correct)  
+Framework handles stochastic transitions naturally
 
+### Cons
 
-
-1\. Sutton, R. S., \& Barto, A. G. (2018). \*Reinforcement Learning: An Introduction\* (2nd ed.). MIT Press.
-
-&nbsp;  - Chapter 4: Dynamic Programming
-
-&nbsp;  - Chapter 17: Multi-Agent RL
-
-
-
-2\. Littman, M. L. (1994). \*Markov games as a framework for multi-agent reinforcement learning.\* ICML.
-
-
-
-3\. Leibo, J. Z., et al. (2017). \*Multi-agent Reinforcement Learning in Sequential Social Dilemmas.\* AAMAS.
-
-
-
-4\. Pinto, L., et al. (2017). \*Robust Adversarial Reinforcement Learning.\* ICML.
-
-
+State space explosion is REAL - adding adversary increased states from 25 to 625  
+Building transition model P(s'|s,a) manually is tedious and error-prone  
+Assumes we know P and R perfectly (unrealistic for real-world)  
+For continuous states would need function approximation (whole new complexity layer)
 
 ---
 
+## References
 
+Sutton, R. S., & Barto, A. G. (2018). Reinforcement Learning: An Introduction (2nd ed.). MIT Press. Chapters 3-4 (MDP sections)
 
-\## 8. Collaboration \& Academic Integrity
+Littman, M. L. (1994). Markov games as a framework for multi-agent reinforcement learning. ICML.
 
+David Silver RL Course, Lecture 3 (Planning by Dynamic Programming)
 
+Gymnasium documentation: https://gymnasium.farama.org/
 
-\*\*Author:\*\* Uzezi Olorunmola (Solo Project)
-
-
-
-\*\*Tools Used:\*\*
-
-\- Python 3.13
-
-\- NumPy 2.2.5, Matplotlib 3.10.1
-
-\- Git/GitHub for version control
-
-\- Cookiecutter Data Science template
-
-
-
-\*\*LLM Assistance:\*\*
-
-\- Claude (Anthropic) for code debugging, architecture suggestions, and documentation review
-
-\- All code implementations personally verified and understood
-
-\- Full conversation logs archived (available upon request per course policy)
-
-
+Course lecture materials (Week 2-5)
 
 ---
 
+## Academic Integrity
 
+Solo project: Uzezi Olorunmola
 
-\*End of V1 Proposal - Pursuit-Evasion GridWorld\*
+LLM assistance: Claude AI (Anthropic) for debugging, concept explanations, and documentation structure. Full conversation logs archived and available per course policy.
 
+All code implementations personally verified and understood.
+
+---
+
+Last updated: February 11, 2026  
+Version 1 Submission
