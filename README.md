@@ -93,24 +93,19 @@ rl-capstone-gridworld/
 - [x] Value iteration implementation
 - [x] Save policy, values, Q-table
 
-### 🔄 V2 (Week 9) - Model-Free Learning
-- [ ] Stochastic adversary behavior
-- [ ] Q-learning implementation
-- [ ] SARSA implementation
-- [ ] Learning curves & ablations
+### V2 - Model-Free Learning (Next Milestone)
+- Stochastic adversary behavior
+- Q-learning implementation
+- SARSA implementation
+- Learning curves and ablations
 
-### 🔄 V3 (Week 13) - Self-Play
-- [ ] Learning adversary (policy gradient)
-- [ ] Partial observability (POMDP)
-- [ ] 10×10 environment (10K states)
-- [ ] Animated visualizations
+### V3 - Advanced Topics (Future Direction)
+- Self-play with learning adversary
+- Partial observability
+- Scaling to larger environments
+- Performance analysis
 
-### 🔄 Final (Week 16) - Deep RL
-- [ ] DQN for large state spaces
-- [ ] Multi-agent deep RL (A3C)
-- [ ] Transfer learning experiments
-- [ ] Research-quality writeup
-
+Project scope and direction may evolve based on course content and research interests.
 ---
 
 ## Technical Details
