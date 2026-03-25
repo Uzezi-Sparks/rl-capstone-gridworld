@@ -1,0 +1,111 @@
+import numpy as np
+
+class TDLambdaAgent:
+    """
+    TD(Lambda) with Eligibility Traces - Backward View
+    
+    Forward view: theoretical, averages n-step returns weighted by lambda
+    Backward view: practical implementation using eligibility traces
+    
+    Update rule:
+        delta = r + gamma * V(s') - V(s)       # TD error
+        e(s) = gamma * lambda * e(s) + 1        # eligibility trace
+        V(s) <- V(s) + alpha * delta * e(s)     # value update
+    """
+
+    def __init__(self, n_states, n_actions, alpha=0.1, gamma=0.9, 
+                 epsilon=0.1, lambda_=0.9):
+        self.n_states = n_states
+        self.n_actions = n_actions
+        self.alpha = alpha
+        self.gamma = gamma
+        self.epsilon = epsilon
+        self.lambda_ = lambda_
+
+        # Q-table
+        self.Q = np.zeros((n_states, n_actions))
+
+        # Eligibility traces (same shape as Q)
+        self.e = np.zeros((n_states, n_actions))
+
+    def get_action(self, state):
+        """Epsilon-greedy action selection"""
+        if np.random.random() < self.epsilon:
+            return np.random.randint(self.n_actions)
+        return np.argmax(self.Q[state])
+
+    def reset_traces(self):
+        """Reset eligibility traces at start of each episode"""
+        self.e = np.zeros((self.n_states, self.n_actions))
+
+    def update(self, state, action, reward, next_state, next_action, done):
+        """
+        Backward-view TD(Lambda) update (SARSA-Lambda)
+        
+        Steps:
+        1. Compute TD error
+        2. Increment eligibility trace for visited (s,a)
+        3. Update ALL Q(s,a) weighted by their trace
+        4. Decay all traces
+        """
+        # Step 1: TD error
+        if done:
+            delta = reward - self.Q[state, action]
+        else:
+            delta = (reward + self.gamma * self.Q[next_state, next_action] 
+                    - self.Q[state, action])
+
+        # Step 2: Increment trace for current (state, action)
+        self.e[state, action] += 1
+
+        # Step 3 & 4: Update all Q values and decay traces
+        self.Q += self.alpha * delta * self.e
+        self.e *= self.gamma * self.lambda_
+
+        return delta
+
+    def get_greedy_action(self, state):
+        return np.argmax(self.Q[state])
+
+    def save(self, path):
+        np.save(path, self.Q)
+        print(f"Q-table saved to {path}")
+
+    def load(self, path):
+        self.Q = np.load(path)
+        print(f"Q-table loaded from {path}")
+
+
+class SARSALambdaAgent(TDLambdaAgent):
+    """
+    SARSA(Lambda) - explicit subclass of TD(Lambda)
+    On-policy control with eligibility traces
+    
+    Forward view:  weighted average of n-step SARSA returns
+    Backward view: eligibility traces (implemented here)
+    """
+    def __init__(self, n_states, n_actions, alpha=0.1, gamma=0.9,
+                 epsilon=0.1, lambda_=0.9):
+        super().__init__(n_states, n_actions, alpha, gamma, epsilon, lambda_)
+        print(f"SARSA(λ) initialized | lambda={lambda_}, alpha={alpha}, gamma={gamma}")
+
+
+class QLambdaAgent(TDLambdaAgent):
+    """
+    Q(Lambda) - off-policy TD(Lambda)
+    Uses max Q(s',a') instead of actual next action
+    """
+    def update(self, state, action, reward, next_state, next_action, done):
+        """Off-policy update using max Q"""
+        if done:
+            delta = reward - self.Q[state, action]
+        else:
+            # Off-policy: use max instead of actual next action
+            delta = (reward + self.gamma * np.max(self.Q[next_state])
+                    - self.Q[state, action])
+
+        self.e[state, action] += 1
+        self.Q += self.alpha * delta * self.e
+        self.e *= self.gamma * self.lambda_
+
+        return delta

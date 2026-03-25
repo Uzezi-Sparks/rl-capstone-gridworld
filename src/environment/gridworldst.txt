@@ -18,7 +18,7 @@ class PursuitEvasionEnv:
         self.size = grid_size
         self.goal = goal
         self.adversary_start = adversary_start
-        self.stochastic_prob = stochastic_prob
+	self.stochastic_prob = stochastic_prob
         
         # Actions for agent (adversary uses same)
         self.actions = {
@@ -57,34 +57,38 @@ class PursuitEvasionEnv:
             patrol.append((0, j))
         return patrol
     
-    def get_adversary_next_pos(self, current_adv_pos, timestep=0):
-        """Get adversary next position (stochastic 75% patrol, 25% random)"""
+   def get_adversary_next_pos(self, current_adv_pos, timestep=0):
+    """Get adversary next position (stochastic 75% patrol, 25% random)"""
+    
+    # Stochastic adversary: 75/25 split
+    if np.random.random() < self.stochastic_prob:
+        # RANDOM MOVEMENT (25% if stochastic_prob=0.25)
+        valid_moves = []
+        for action in [(0, 1), (0, -1), (1, 0), (-1, 0)]:  # right, left, down, up
+            next_pos = (current_adv_pos[0] + action[0], 
+                       current_adv_pos[1] + action[1])
+            # Check bounds
+            if (0 <= next_pos[0] < self.size and 
+                0 <= next_pos[1] < self.size):
+                valid_moves.append(next_pos)
         
-        if np.random.random() < self.stochastic_prob:
-            # RANDOM MOVEMENT
-            valid_moves = []
-            for action in [(0, 1), (0, -1), (1, 0), (-1, 0)]:
-                next_pos = (current_adv_pos[0] + action[0], 
-                           current_adv_pos[1] + action[1])
-                if (0 <= next_pos[0] < self.size and 
-                    0 <= next_pos[1] < self.size):
-                    valid_moves.append(next_pos)
-            
-            if valid_moves:
-                return valid_moves[np.random.randint(len(valid_moves))]
-            else:
-                return current_adv_pos
-        
+        # Pick random valid move
+        if valid_moves:
+            return valid_moves[np.random.randint(len(valid_moves))]
         else:
-            # DETERMINISTIC PATROL
-            if current_adv_pos in self.adversary_patrol:
-                idx = self.adversary_patrol.index(current_adv_pos)
-                next_idx = (idx + 1) % len(self.adversary_patrol)
-                return self.adversary_patrol[next_idx]
-            else:
-                return self.adversary_start
-            
-           
+            return current_adv_pos  # Stay if no valid moves (shouldn't happen)
+    
+    else:
+        # DETERMINISTIC PATROL (75% if stochastic_prob=0.25)
+        if current_adv_pos in self.adversary_patrol:
+            idx = self.adversary_patrol.index(current_adv_pos)
+            next_idx = (idx + 1) % len(self.adversary_patrol)
+            return self.adversary_patrol[next_idx]
+        else:
+            # If not in patrol, move to nearest patrol point
+            return self.adversary_start
+    
+
     def get_all_states(self):
         """Return all valid state tuples (agent_pos, adversary_pos)"""
         states = []
