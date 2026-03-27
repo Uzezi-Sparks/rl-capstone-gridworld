@@ -158,6 +158,132 @@ All code implementations personally verified and understood.
 
 ---
 
+## V2: Model-Free Learning
+**Last Updated: March 26, 2026 | Version 2 Submission**
+
+---
+
+### Overview
+
+This version builds directly on V1 by stripping away the assumption 
+that we KNOW the environment model. In V1, Value Iteration worked 
+because we had perfect knowledge of P(s'|s,a) and R(s,a). But in 
+real pursuit-evasion problems, you don't always get that luxury. 
+The adversary changes behavior, the environment is noisy, and 
+you have to LEARN from experience instead of planning from a model.
+
+That's what V2 is about. Model-free RL i.e. learning what to do 
+just by trying things and seeing what happens.
+
+---
+
+### What Confused Me Initially
+
+Honestly, the hardest part was wrapping my head around the 
+difference between on-policy and off-policy learning. In V1, 
+there was just one policy and one value function. Now suddenly 
+there are agents that learn about a DIFFERENT policy than the 
+one they're actually following? That took a while to click, 
+I don't know if that makes sense.
+
+The second big confusion was eligibility traces i.e. how do you 
+assign credit to decisions you made 5 steps ago that led to a 
+reward NOW? TD(lambda) answers that question but understanding 
+WHY it works took real drilling down.
+
+---
+
+### Algorithm Choice: Why DQN?
+
+This was the most important decision for V2. The environment 
+has discrete actions (UP, DOWN, LEFT, RIGHT), a manageable 
+state space of 625 states, sparse rewards (only at goal/capture), 
+and a stochastic adversary. I needed an algorithm that could 
+handle all of that without unnecessary complexity.
+
+Here is how I thought through the options:
+
+| Algorithm | My Take | Verdict |
+|-----------|---------|---------|
+| **DQN** | Discrete actions map directly to output neurons. Experience replay breaks the correlation between sequential states in pursuit-evasion. Target network handles the stochastic adversary. Extends tabular Q-learning cleanly. | ✅ CHOSEN |
+| REINFORCE | Too much variance with sparse rewards. No replay buffer means slow learning. | ❌ |
+| Vanilla Actor-Critic | Lower variance than REINFORCE but overkill for 4 discrete actions. | ❌ |
+| DDPG | Designed specifically for CONTINUOUS action spaces. Wrong fit entirely. | ❌ |
+| TD3 | Same problem as DDPG - continuous actions only. | ❌ |
+| PPO | State of the art and I respect it, but 625 states doesn't need that complexity. | ❌ |
+| TRPO | Theoretically beautiful but the implementation overhead isn't justified here. | ❌ |
+| SAC | Maximum entropy exploration is interesting, but again - continuous actions. | ❌ |
+
+**Insight:** The pattern I noticed is that DDPG, TD3, and SAC are 
+all built for continuous action spaces like robot joints or motor 
+control. My environment is discrete. That eliminates half the list 
+immediately. Between what's left, DQN is the most direct extension 
+of the Q-learning I already implemented in tabular form, which 
+means I can actually compare them as a proper ablation study.
+
+**Why the cons are manageable:**
+DQN can overestimate Q-values, but the target network addresses 
+that directly. The state space is small enough that if DQN 
+completely fails, tabular Q-learning is right there as a fallback. 
+Hyperparameters are logged in configs/dqn.json so experiments 
+are reproducible.
+
+---
+
+### Classical RL Algorithms Implemented
+
+All algorithms below are in src/agents/ with matching config 
+files in configs/.
+
+| Algorithm | Type | Key Idea |
+|-----------|------|----------|
+| Q-Learning | Off-policy TD | Learns optimal policy regardless of exploration |
+| SARSA | On-policy TD | Learns the policy it actually follows. Safer. |
+| TD(λ) Backward | Eligibility traces | Credit flows backwards through visited states |
+| TD(λ) Forward | Lambda-returns | Weighted average of all n-step returns |
+| SARSA(λ) | On-policy traces | SARSA with eligibility trace credit assignment |
+| SARSA(n) | n-step forward view | Bridges TD(0) and MC via hyperparameter n |
+| Q(λ) | Off-policy traces | Q-learning with backwards credit propagation |
+| Monte Carlo | Full episode returns | No bootstrapping. Unbiased but high variance. |
+| TD(n) | n-step TD | n=1 is TD(0), n=infinity approaches MC |
+| DQN | Deep off-policy TD | Neural network + replay buffer + target network |
+
+---
+
+### Pros and Cons of Model-Free RL (What I Actually Learned)
+
+**Pros:**
+No need to know P or R upfront - the agent figures it out by 
+interacting with the environment. This is MUCH more realistic 
+for real problems. Works even when the adversary changes 
+behavior (stochastic transitions). Scales to problems where 
+building a model is simply impossible.
+
+**Cons:**
+Sample efficiency is a REAL issue. Value iteration converged 
+in 9 iterations in V1. Model-free methods need thousands of 
+episodes. The exploration-exploitation tradeoff is now a 
+design decision you have to make manually via epsilon. 
+And debugging is harder because failures could be hyperparameters, 
+not bugs in the code, I don't know if that makes sense.
+
+---
+
+### Tools Used
+
+Python 3.13.2, NumPy, Matplotlib  
+LLM: Claude AI for concept explanations, debugging, and implementation  
+Collaborators: Course colleagues for conceptual discussions
+
+---
+
+### Academic References
+
+- Sutton & Barto, "Reinforcement Learning: An Introduction", Chapters 5-7
+- David Silver RL Course, Lectures 4-6
+- Mnih et al. (2015), "Human-level control through deep reinforcement learning" (DQN paper)
+- Course lecture materials (Week 5-6)
+
 ## License
 
 MIT License - See LICENSE file for details

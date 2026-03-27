@@ -1,0 +1,21 @@
+{
+  "algorithm": "DQN",
+  "type": "deep off-policy TD control",
+  "environment": "PursuitEvasionEnv",
+  "hyperparameters": {
+    "alpha": 0.001,
+    "gamma": 0.9,
+    "epsilon_start": 1.0,
+    "epsilon_min": 0.01,
+    "epsilon_decay": 0.995,
+    "batch_size": 32,
+    "buffer_size": 10000,
+    "target_update_freq": 100,
+    "hidden_size": 64,
+    "n_episodes": 2000
+  },
+  "network_architecture": "MLP: 4 -> 64 -> 64 -> 4",
+  "state_space": 4,
+  "action_space": 4,
+  "notes": "Online + target network for stability. Experience replay breaks sample correlation."
+}

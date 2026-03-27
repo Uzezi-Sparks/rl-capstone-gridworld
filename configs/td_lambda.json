@@ -1,0 +1,15 @@
+{
+  "algorithm": "TD-Lambda",
+  "type": "backward-view TD with eligibility traces",
+  "environment": "PursuitEvasionEnv",
+  "hyperparameters": {
+    "alpha": 0.1,
+    "gamma": 0.9,
+    "epsilon": 0.1,
+    "lambda": 0.9,
+    "n_episodes": 2000
+  },
+  "state_space": 625,
+  "action_space": 4,
+  "notes": "Lambda=0 reduces to TD(0). Lambda=1 approaches MC. Faster credit assignment for sparse rewards."
+}

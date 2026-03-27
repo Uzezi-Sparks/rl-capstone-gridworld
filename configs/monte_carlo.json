@@ -1,0 +1,15 @@
+{
+  "algorithm": "Monte Carlo",
+  "type": "on-policy every-visit MC control",
+  "environment": "PursuitEvasionEnv",
+  "hyperparameters": {
+    "alpha": 0.1,
+    "gamma": 0.9,
+    "epsilon": 0.1,
+    "epsilon_decay": null,
+    "n_episodes": 2000
+  },
+  "state_space": 625,
+  "action_space": 4,
+  "notes": "No bootstrapping — uses complete episode returns. Unbiased but high variance. Requires episodic environment."
+}

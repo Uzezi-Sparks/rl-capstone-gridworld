@@ -1,0 +1,15 @@
+{
+  "algorithm": "TD-n",
+  "type": "n-step forward-view TD control",
+  "environment": "PursuitEvasionEnv",
+  "hyperparameters": {
+    "alpha": 0.1,
+    "gamma": 0.9,
+    "epsilon": 0.1,
+    "n": 3,
+    "n_episodes": 2000
+  },
+  "state_space": 625,
+  "action_space": 4,
+  "notes": "n=1 reduces to TD(0). n=infinity approaches MC. Tune n to balance bias vs variance."
+}

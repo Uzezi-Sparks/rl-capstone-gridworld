@@ -21,6 +21,7 @@ from src.agents.td_lambda import TDLambdaAgent, SARSALambdaAgent, QLambdaAgent
 from src.agents.monte_carlo import MonteCarloAgent
 from src.agents.td_n import TDnAgent
 
+
 print('Testing all classical RL agents...')
 
 QLearningAgent(625, 4)
@@ -46,5 +47,16 @@ print('✅ TD(n) - n=3')
 
 TDnAgent(625, 4, n=5)
 print('✅ TD(n) - n=5')
+
+from src.agents.td_lambda import TDLambdaForward, SARSAnAgent
+
+TDLambdaForward(625, 4)
+print('✅ TD(Lambda) Forward View')
+
+SARSAnAgent(625, 4, n=3)
+print('✅ SARSA(n) - n=3')
+
+SARSAnAgent(625, 4, n=5)
+print('✅ SARSA(n) - n=5')
 
 print('\n🎉 All classical RL agents loaded successfully!')

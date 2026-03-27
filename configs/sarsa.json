@@ -1,0 +1,15 @@
+{
+  "algorithm": "SARSA",
+  "type": "on-policy TD control",
+  "environment": "PursuitEvasionEnv",
+  "hyperparameters": {
+    "alpha": 0.1,
+    "gamma": 0.9,
+    "epsilon": 0.1,
+    "epsilon_decay": null,
+    "n_episodes": 2000
+  },
+  "state_space": 625,
+  "action_space": 4,
+  "notes": "Safer on-policy agent. Better when exploration mistakes have real costs e.g. getting caught."
+}
