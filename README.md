@@ -158,7 +158,7 @@ All code implementations personally verified and understood.
 
 ---
 
-## V2: Model-Free Learning
+## V2: Model-Free Learning: https://github.com/Uzezi-Sparks/rl-capstone-gridworld/tree/v2-model-free
 **Last Updated: March 26, 2026 | Version 2 Submission**
 
 ---
@@ -172,21 +172,21 @@ real pursuit-evasion problems, you don't always get that luxury.
 The adversary changes behavior, the environment is noisy, and 
 you have to LEARN from experience instead of planning from a model.
 
-That's what V2 is about. Model-free RL i.e. learning what to do 
-just by trying things and seeing what happens.
+That's what V2 is about. Model-free RL, i.e., learning what to do 
+just by trying things and seeing what happens
 
 ---
 
 ### What Confused Me Initially
 
-Honestly, the hardest part was wrapping my head around the 
-difference between on-policy and off-policy learning. In V1, 
-there was just one policy and one value function. Now suddenly 
-there are agents that learn about a DIFFERENT policy than the 
+One of the main challenges was really understanding in depth, the 
+differences between on-policy and off-policy learning. In V1, 
+there was just one policy and one value function. V2 throws in more complexity 
+with a sudden increase in how some agents learn about a DIFFERENT policy than the 
 one they're actually following? That took a while to click, 
 I don't know if that makes sense.
 
-The second big confusion was eligibility traces i.e. how do you 
+The second hrudle was eligibility traces i.e. how do you 
 assign credit to decisions you made 5 steps ago that led to a 
 reward NOW? TD(lambda) answers that question but understanding 
 WHY it works took real drilling down.
