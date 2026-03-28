@@ -154,11 +154,11 @@ Project scope and direction may evolve based on course content and research inte
 - Claude AI (Anthropic) - debugging assistance and documentation review
 - Full LLM conversation logs archived (available per course policy)
 
-All code implementations personally verified and understood.
+All code implementations were personally verified and understood.
 
 ---
 
-## V2: Model-Free Learning
+## V2: Model-Free Learning [(https://github.com/Uzezi-Sparks/rl-capstone-gridworld/tree/v2-model-free)]
 **Last Updated: March 26, 2026 | Version 2 Submission**
 
 ---
@@ -172,7 +172,7 @@ real pursuit-evasion problems, you don't always get that luxury.
 The adversary changes behavior, the environment is noisy, and 
 you have to LEARN from experience instead of planning from a model.
 
-That's what V2 is about. Model-free RL i.e. learning what to do 
+That's what V2 is about. Model-free RL i.e., learning what to do 
 just by trying things and seeing what happens.
 
 ---
@@ -182,7 +182,7 @@ just by trying things and seeing what happens.
 Honestly, the hardest part was wrapping my head around the 
 difference between on-policy and off-policy learning. In V1, 
 there was just one policy and one value function. Now suddenly 
-there are agents that learn about a DIFFERENT policy than the 
+some agents learn about a DIFFERENT policy than the 
 one they're actually following? That took a while to click, 
 I don't know if that makes sense.
 
@@ -205,14 +205,14 @@ Here is how I thought through the options:
 
 | Algorithm | My Take | Verdict |
 |-----------|---------|---------|
-| **DQN** | Discrete actions map directly to output neurons. Experience replay breaks the correlation between sequential states in pursuit-evasion. Target network handles the stochastic adversary. Extends tabular Q-learning cleanly. | ✅ CHOSEN |
+| **DQN** | Discrete actions map directly to output neurons. Experience replay breaks the correlation between sequential states in pursuit-evasion. The target network handles the stochastic adversary. Extends tabular Q-learning cleanly. | ✅ CHOSEN |
 | REINFORCE | Too much variance with sparse rewards. No replay buffer means slow learning. | ❌ |
-| Vanilla Actor-Critic | Lower variance than REINFORCE but overkill for 4 discrete actions. | ❌ |
+| Vanilla Actor-Critic | Lower variance than REINFORCE, but overkill for 4 discrete actions. | ❌ |
 | DDPG | Designed specifically for CONTINUOUS action spaces. Wrong fit entirely. | ❌ |
 | TD3 | Same problem as DDPG - continuous actions only. | ❌ |
-| PPO | State of the art and I respect it, but 625 states doesn't need that complexity. | ❌ |
-| TRPO | Theoretically beautiful but the implementation overhead isn't justified here. | ❌ |
-| SAC | Maximum entropy exploration is interesting, but again - continuous actions. | ❌ |
+| PPO | State of the art, and I respect it, but 625 states don't need that complexity. | ❌ |
+| TRPO | Theoretically beautiful, but the implementation overhead isn't justified here. | ❌ |
+| SAC | Maximum entropy exploration is interesting, but again, continuous actions. | ❌ |
 
 **Insight:** The pattern I noticed is that DDPG, TD3, and SAC are 
 all built for continuous action spaces like robot joints or motor 
@@ -225,7 +225,7 @@ means I can actually compare them as a proper ablation study.
 DQN can overestimate Q-values, but the target network addresses 
 that directly. The state space is small enough that if DQN 
 completely fails, tabular Q-learning is right there as a fallback. 
-Hyperparameters are logged in configs/dqn.json so experiments 
+Hyperparameters are logged in configs/dqn.json, so experiments 
 are reproducible.
 
 ---
@@ -265,7 +265,7 @@ in 9 iterations in V1. Model-free methods need thousands of
 episodes. The exploration-exploitation tradeoff is now a 
 design decision you have to make manually via epsilon. 
 And debugging is harder because failures could be hyperparameters, 
-not bugs in the code, I don't know if that makes sense.
+not bugs in the code. I don't know if that makes sense.
 
 ---
 
