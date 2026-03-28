@@ -93,7 +93,7 @@ rl-capstone-gridworld/
 - [x] Value iteration implementation
 - [x] Save policy, values, Q-table
 
-### V2 - Model-Free Learning (Next Milestone)
+### V2 - Model-Free Learning (Milestone)
 - Stochastic adversary behavior
 - Q-learning implementation
 - SARSA implementation
