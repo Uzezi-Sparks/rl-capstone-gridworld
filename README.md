@@ -93,7 +93,7 @@ rl-capstone-gridworld/
 - [x] Value iteration implementation
 - [x] Save policy, values, Q-table
 
-### V2 - Model-Free Learning (Next Milestone)
+### V2 - Model-Free Learning (Milestone)
 - Stochastic adversary behavior
 - Q-learning implementation
 - SARSA implementation
@@ -168,7 +168,7 @@ All code implementations were personally verified and understood.
 This version builds directly on V1 by stripping away the assumption 
 that we KNOW the environment model. In V1, Value Iteration worked 
 because we had perfect knowledge of P(s'|s,a) and R(s,a). But in 
-real pursuit-evasion problems, you don't always get that luxury. 
+real pursuit-evasion problems, you don't always get that luxury . 
 The adversary changes behavior, the environment is noisy, and 
 you have to LEARN from experience instead of planning from a model.
 
@@ -179,10 +179,10 @@ just by trying things and seeing what happens.
 
 ### What Confused Me Initially
 
-Honestly, the hardest part was wrapping my head around the 
-difference between on-policy and off-policy learning. In V1, 
-there was just one policy and one value function. Now suddenly 
-some agents learn about a DIFFERENT policy than the 
+One of the main challenges was really understanding in depth, the 
+differences between on-policy and off-policy learning. In V1, 
+there was just one policy and one value function. V2 throws in more complexity 
+with a sudden increase in how some agents learn about a DIFFERENT policy than the 
 one they're actually following? That took a while to click, 
 I don't know if that makes sense.
 
