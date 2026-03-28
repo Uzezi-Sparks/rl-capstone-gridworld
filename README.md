@@ -298,5 +298,5 @@ Reinforcement Learning (Spring 2026)
 
 ---
 
-*Last updated: February 11, 2026*
-*Version 1 Submission*
+*Last updated: March 27, 2026*
+*Version 1 & 2 Submission*
