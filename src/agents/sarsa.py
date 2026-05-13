@@ -24,7 +24,7 @@ class SARSAAgent:
         """SARSA update"""
         q_current = self.Q[state, action]
         if done:
-            q_target = rewardss
+            q_target = rewards
         else:
             q_target = reward + self.gamma * self.Q[next_state, next_action]
         self.Q[state, action] += self.alpha * (q_target - q_current)
