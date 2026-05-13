@@ -6,11 +6,11 @@ def compute_metrics(returns):
     """
 
     metrics = {
-        "mean_return": np.mean(returns),
-        "std_return": np.std(returns),
-        "max_return": np.max(returns),
-        "min_return": np.min(returns),
-        "episodes": len(returns)
+        "mean_return": float(np.mean(returns)),
+        "std_return": float(np.std(returns)),
+        "max_return": float(np.max(returns)),
+        "min_return": float(np.min(returns)),
+        "episodes": int(len(returns))
     }
 
     return metrics
