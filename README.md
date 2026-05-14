@@ -93,17 +93,28 @@ rl-capstone-gridworld/
 - [x] Value iteration implementation
 - [x] Save policy, values, Q-table
 
-### V2 - Model-Free Learning (Milestone)
-- Stochastic adversary behavior
-- Q-learning implementation
-- SARSA implementation
-- Learning curves and ablations
 
-### V3 - Advanced Topics (Future Direction)
-- Self-play with learning adversary
-- Partial observability
-- Scaling to larger environments
-- Performance analysis
+### ✅ V2 - Model-Free Learning (Milestone)
+- [x] Stochastic adversary behavior
+- [x] Q-learning implementation
+- [x] SARSA implementation
+- [x] Learning curves and ablations
+
+
+### ✅ V3 - Optimization, Evaluation & Validation (Milestone)
+- [x] Random Search for hyperparameter optimization
+- [x] Q-Learning evaluation under stochastic environments
+- [x] Experiment logging pipeline
+- [x] Performance metrics & analysis
+- [x] Repeated trial validation
+- [x] Result visualization and evidence tracking
+
+Optimization variables explored:
+
+- Alpha (learning rate)
+- Gamma (discount factor)
+- Epsilon (exploration rate)
+
 
 Project scope and direction may evolve based on course content and research interests.
 ---
@@ -300,3 +311,123 @@ Reinforcement Learning (Spring 2026)
 
 *Last updated: March 27, 2026*
 *Version 1 & 2 Submission*
+
+---
+
+
+# V3: Optimization, Evaluation & Validation ([Branch Link](https://github.com/Uzezi-Sparks/rl-capstone-gridworld/tree/v3-optimization))
+
+**Last Updated:** May 13, 2026 | Version 3 Submission
+
+## Overview
+
+V3 builds directly on V2, but this time the focus shifted beyond simply training an agent.
+
+Once stochastic behavior, exploration policies and larger state representations were introduced, repeated runs naturally started producing different outcomes.
+
+That was expected.
+
+The more important question became:
+
+*How do we know whether an observed result is actually better, or simply a good run?*
+
+That question ended up shaping V3.
+
+Rather than relying on isolated results, this stage introduced structured experimentation and evaluation. The goal moved from simply training agents toward optimizing, testing and validating behavior under uncertainty.
+
+---
+
+## What Stood Out To Me
+
+One thing became obvious fairly quickly: variability itself was not the problem.
+
+The environment was doing exactly what it was designed to do.
+
+A stochastic adversary, exploration strategies and a larger state space meant repeated runs were naturally producing different outcomes. At first that looked messy. Later it became one of the most interesting parts of the project.
+
+Instead of asking:
+
+*"Why are results changing?"*
+
+the better question became:
+
+*"What patterns still emerge despite uncertainty?"*
+
+That shift changed how I looked at evaluation.
+
+---
+
+## V3 Design Choice: Why Optimization?
+
+This was probably the most important V3 decision.
+
+By this point, training alone was no longer enough. If two runs could produce different outcomes under identical settings, then relying on single experiments became difficult to defend.
+
+I needed a way to evaluate behavior systematically.
+
+Key additions:
+
+- Random hyperparameter search
+- Experiment logging
+- Performance metrics
+- Repeated evaluation runs
+- Visualization and evidence tracking
+
+Workflow evolution:
+
+```text
+train
+   ↓
+evaluate
+   ↓
+compare
+   ↓
+optimize
+```
+
+---
+
+## Early Findings
+
+Repeated experimentation showed some interesting patterns:
+
+| Alpha | Gamma | Epsilon | Mean Return |
+|---:|---:|---:|---:|
+| 0.2 | 0.95 | 0.10 | -7.46 |
+| 0.2 | 0.95 | 0.05 | -9.46 |
+| 0.1 | 0.95 | 0.05 | -10.10 |
+
+Observations:
+
+- Higher gamma values repeatedly appeared in stronger configurations
+- Performance varied naturally across repeated runs
+- No single configuration consistently dominated every experiment
+
+---
+
+## Development Tools
+
+- Python 3.13
+- NumPy
+- Matplotlib
+- Git/GitHub
+- Experiment logging utilities
+- Random search evaluation pipeline
+
+---
+
+## Academic Integrity
+
+Solo Project: Uzezi Olorunmola
+
+Development support tools:
+
+- Claude AI (debugging discussion and implementation support)
+- ChatGPT (implementation support, debugging and documentation refinement)
+
+All implementations were personally reviewed, tested and understood.
+
+For the complete V3 narrative:
+
+`README_v3.md`
+
