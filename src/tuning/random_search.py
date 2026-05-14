@@ -14,19 +14,37 @@ def sample_config(agent_name):
     }
 
 
+
 def mock_experiment(config):
     """
-    Temporary V3 placeholder.
+    Lightweight pseudo-training run.
 
-    Simulates experiment returns.
-    Real training loop comes later.
+    Mimics reward variation based on sampled
+    hyperparameters so search behaves realistically.
     """
 
-    returns = [1, 2, 4, 3, 5]
+    alpha = config["alpha"]
+    gamma = config["gamma"]
+    epsilon = config["epsilon"]
+
+    score = (
+        gamma * 10
+        + alpha * 5
+        - epsilon * 2
+    )
+
+    returns = [
+        score - 1,
+        score,
+        score + 1,
+        score - 0.5,
+        score + 0.5
+    ]
 
     return compute_metrics(
         returns
     )
+
 
 
 def run_random_search(agent_name, n_trials=5):
