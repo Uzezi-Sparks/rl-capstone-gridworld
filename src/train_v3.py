@@ -10,6 +10,7 @@ from src.evaluation.experiment_logger import save_experiment
 
 
 def load_config(agent_name):
+
     with open(f"configs/{agent_name}.json", "r") as f:
         return json.load(f)
 
@@ -19,6 +20,7 @@ def build_agent(agent_name, config):
     hp = config["hyperparameters"]
 
     if agent_name == "qlearning":
+
         return QLearningAgent(
             n_states=625,
             n_actions=4,
@@ -28,6 +30,7 @@ def build_agent(agent_name, config):
         )
 
     elif agent_name == "dqn":
+
         return DQNAgent(
             state_size=4,
             n_actions=4,
@@ -54,7 +57,9 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    config = load_config(args.agent)
+    config = load_config(
+        args.agent
+    )
 
     env = PursuitEvasionEnv(
         stochastic_prob=0.25
@@ -68,9 +73,77 @@ if __name__ == "__main__":
     print(f"Loaded: {args.agent}")
     print("V3 orchestration initialized")
 
-    dummy_returns = [1, 2, 3, 4, 5]
+    returns = []
 
-    metrics = compute_metrics(dummy_returns)
+    for episode in range(5):
+
+        state = (
+            (0, 0),
+            env.adversary_start
+        )
+
+        total_reward = 0
+        done = False
+        steps = 0
+
+        while not done and steps < 50:
+
+            agent_pos, adv_pos = state
+	    
+            state_idx = (
+		(agent_pos[0]*env.size + agent_pos[1])
+		*(env.size * env.size)
+		+ (adv_pos[0] * env.size + adv_pos[1])
+            )
+
+            action = agent.get_action(
+                state_idx
+
+            )
+
+            next_state = env.get_next_state(
+                state,
+                action
+            )
+            reward = env.get_reward(
+                state,
+                action,
+                next_state
+            )
+            done = env.is_terminal(
+                next_state
+            )
+
+            if hasattr(agent, "update"):
+		
+                next_agent, next_adv = next_state
+                next_idx = (
+                    (next_agent[0] * env.size + next_agent[1])
+                    * (env.size * env.size)
+                    + (next_adv[0] * env.size + next_adv[1])  
+
+               )
+                agent.update(
+                    state_idx,
+                    action,
+                    reward,
+                    next_idx,
+                    done
+               )
+
+            total_reward += reward
+
+            state = next_state
+
+            steps += 1
+
+        returns.append(
+            total_reward
+        )
+
+    metrics = compute_metrics(
+        returns
+    )
 
     save_experiment(
         metrics,
