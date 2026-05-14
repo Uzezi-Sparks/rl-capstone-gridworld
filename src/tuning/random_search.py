@@ -17,6 +17,95 @@ def sample_config(agent_name):
 
 def mock_experiment(config):
     """
+    Run lightweight V3 experiment
+    using actual environment interaction
+    """
+
+    from src.environment.gridworld import PursuitEvasionEnv
+    from src.agents.qlearning import QLearningAgent
+
+    env = PursuitEvasionEnv(
+        stochastic_prob=0.25
+    )
+
+    agent = QLearningAgent(
+        n_states=625,
+        n_actions=4,
+        alpha=config["alpha"],
+        gamma=config["gamma"],
+        epsilon=config["epsilon"]
+    )
+
+    returns = []
+
+    for episode in range(5):
+
+        state = (
+            (0,0),
+            env.adversary_start
+        )
+
+        total_reward = 0
+        done = False
+        steps = 0
+
+        while not done and steps < 50:
+
+            agent_pos, adv_pos = state
+
+            state_idx = (
+                (agent_pos[0]*env.size+agent_pos[1])
+                *(env.size*env.size)
+                +(adv_pos[0]*env.size+adv_pos[1])
+            )
+
+            action = agent.get_action(
+                state_idx
+            )
+
+            next_state = env.get_next_state(
+                state,
+                action
+            )
+
+            reward = env.get_reward(
+                state,
+                action,
+                next_state
+            )
+
+            done = env.is_terminal(
+                next_state
+            )
+
+            next_agent, next_adv = next_state
+
+            next_idx = (
+                (next_agent[0]*env.size+next_agent[1])
+                *(env.size*env.size)
+                +(next_adv[0]*env.size+next_adv[1])
+            )
+
+            agent.update(
+                state_idx,
+                action,
+                reward,
+                next_idx,
+                done
+            )
+
+            total_reward += reward
+            state = next_state
+            steps += 1
+
+        returns.append(
+            total_reward
+        )
+
+    return compute_metrics(
+        returns
+    )
+    """
     Lightweight pseudo-training run.
 
     Mimics reward variation based on sampled
