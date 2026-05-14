@@ -1,0 +1,40 @@
+V3 Evidence Log
+
+Repeated Random Search Findings
+
+Run A:
+Best config:
+alpha=0.2
+gamma=0.95
+epsilon=0.1
+score=-7.46
+
+Run B:
+Best config:
+alpha=0.2
+gamma=0.95
+epsilon=0.05
+score=-9.46
+
+Run C:
+Best config:
+alpha=0.1
+gamma=0.95
+epsilon=0.05
+score=-10.10
+
+Run D:
+Best config:
+alpha=0.2
+gamma=0.95
+epsilon=0.2
+score=-9.40
+
+
+Noteable Observations:
+
+1.Performance varied across repeated runs.
+2.Stochastic adversary and epsilon exploration introduced uncertainty.
+3.Gamma=0.95 repeatedly appeared in stronger configurations.
+4.No single configuration dominated every run.
+5.Variability motivated optimization and structured evaluation.
