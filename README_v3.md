@@ -381,6 +381,42 @@ However, none of the configurations proved optimal in each and every test case.
 
 This finding is important since, rather than leading towards a conclusion regarding a single optimal hyperparameter setting, this result reiterates the necessity of running multiple tests instead of just one or two runs.
 
+---
+
+## Exploratory Extension: Partial Observability
+
+As a final extension, V3 moved beyond optimization alone and explored an uncertainty-inspired environment modification motivated by POMDP concepts discussed in class.
+
+Earlier versions assumed complete state information. The agent always knew where the adversary was located.
+
+To gradually move toward more realistic environments, a visibility mechanism was introduced.
+
+Key additions:
+
+- Visibility radius parameter
+- Hidden adversary states outside local range
+- Observation filtering
+- Visibility-based evaluation experiments
+
+The environment behavior became:
+
+```text
+Full observability
+       ↓
+limited visibility
+       ↓
+partial information
+```
+
+Rather than always observing the adversary position directly, the agent only received information when the adversary was within a specified visibility radius.
+
+Example observations:
+
+Radius 1 → 33% visible  
+Radius 2 → 67% visible  
+Radius 5 → 100% visible  
+
+This extension was intentionally exploratory rather than a full POMDP implementation. The objective was to investigate how reducing information availability changes environmental uncertainty and creates a foundation for future partially observable RL research.
 
 ---
 
@@ -471,5 +507,21 @@ rl-capstone-gridworld/
 └── README_v3.md
 
 ```
+
+---
+
+## Academic Integrity
+
+**Solo Project:** Uzezi Olorunmola
+
+**Development Tools:**
+- Python 3.13, NumPy 2.2.5, Matplotlib 3.10.1
+- Git/GitHub, Cookiecutter Data Science template
+- ChatGpt & Claude AI - debugging assistance and documentation review
+- Full LLM conversation logs archived (available per course policy)
+
+All code implementations personally verified and understood.
+
+---
 
 
