@@ -1,8 +1,7 @@
-Reinforcement Learning Capstone: Pursuit–Evasion GridWorld (V1 → V3)
+# Reinforcement Learning Capstone: Pursuit–Evasion GridWorld (V1 → V3)
 
+## Project Overview
 
-
-Project Overview:
 
 This project was started with a simple question in mind: what happens when an environment gradually becomes less predictable?
 
@@ -38,15 +37,14 @@ V3 does not replace earlier versions. It builds on them. The focus shifted from 
 
 The real issue was the broader issue of what happens when RL systems get more complex, and how systematic evaluation often means better decision making under uncertainty.
 
-\---
+---
 
 
 
-\## Project Evolution
+## Project Evolution
 
 
-
-\### V1 — Building the Foundation
+### V1 — Building the Foundation
 
 
 
@@ -58,29 +56,25 @@ Key focus areas:
 
 
 
-\- Known environment transitions
-
-\- Value Iteration baseline
-
-\- Policy computation under certainty
-
-\- Establishing a performance reference point
-
+- Known environment transitions
+- Value Iteration baseline
+- Policy computation under certainty
+- Establishing a performance reference point
 
 
 This stage answered an important question:
 
 
 
-\*Can an optimal policy be computed when the environment is fully understood?\*
+*Can an optimal policy be computed when the environment is fully understood?*
 
 
 
-\---
+---
 
 
 
-\### V2 — Learning Through Interaction
+### V2 — Learning Through Interaction
 
 
 
@@ -96,15 +90,11 @@ Several Reinforcement Learning methods were introduced:
 
 
 
-\- Q-Learning
-
-\- SARSA
-
-\- TD(λ)
-
-\- Monte Carlo methods
-
-\- Deep Q-Networks (DQN)
+- Q-Learning
+- SARSA
+- TD(λ)
+- Monte Carlo methods
+- Deep Q-Networks (DQN)
 
 
 
@@ -112,13 +102,10 @@ This stage introduced:
 
 
 
-\- exploration using epsilon-greedy policies
-
-\- stochastic adversary movement
-
-\- larger state representation
-
-\- uncertainty in outcomes
+- exploration using epsilon-greedy policies
+- stochastic adversary movement
+- larger state representation
+- uncertainty in outcomes
 
 
 
@@ -127,16 +114,14 @@ The project moved from:
 
 
 ```text
-
 solve known dynamics
-
-&#x20;       ↓
-
+      ↓
 learn through interaction
+```
 
+---
 
-
-V3 — Optimize, Test and Validate
+### V3 — Optimize, Test and Validate
 
 
 
@@ -156,25 +141,30 @@ V3 introduced:
 
 
 
-Random hyperparameter search
-
-Experiment logging
-
-Performance metrics
-
-Repeated trials
-
-Visualization and evidence tracking
+- Random hyperparameter search
+- Experiment logging
+- Performance metrics
+- Repeated trials
+- Visualization and evidence tracking
 
 
+The goal shifted toward:
 
-The goal shifted toward: Optimize Test Validate
+```text
+train
+   ↓
+evaluate
+   ↓
+compare
+   ↓
+optimize
+```
 
 ---
 
 
 
-\## Environment Design
+## Environment Design
 
 
 
@@ -186,25 +176,21 @@ The environment consists of:
 
 
 
-a) A 5×5 GridWorld
-
-b) An agent attempting to reach a goal state
-
-c) An adversary following a partially stochastic movement policy
-
-d) Reward and penalty structures designed to encourage efficient behavior
-
+- A 5×5 GridWorld
+- An agent attempting to reach a goal state
+- An adversary following a partially stochastic movement policy
+- Reward and penalty structures encouraging efficient behavior
 
 
 The environment was intentionally designed to evolve alongside the project to be as close to reality as possible.
 
 
 
-Early versions emphasized control and predictability. Later versions introduced uncertainty through exploration policies and stochastic adversary behavior. This made learning less straightforward, but also more representative of realistic decision-making problems.
+Early versions emphasized control and predictability. Later versions introduced uncertainty through exploration policies and stochastic adversary behavior. This made learning less straightforward, but also more representative of real-world decision-making challenges.
 
 
 
-\### Reward Structure
+### Reward Structure
 
 
 
@@ -232,11 +218,12 @@ The shortest path was not always the safest path.
 
 Agents therefore had to balance exploration, efficiency and risk.
 
-\## Learning Strategies
+
+## Learning Strategies
 
 
 
-Alongside the environmental developments, learning strategies have developed.
+Alongside the environmental developments, learning strategies also evolved.
 
 
 
@@ -244,7 +231,7 @@ Not just new algorithms were introduced for each version – they helped underst
 
 
 
-\### Dynamic Programming-Based Strategies (V1)
+### Dynamic Programming-Based Strategies (V1)
 
 
 
@@ -256,11 +243,9 @@ These included:
 
 
 
-\- Value iteration algorithm
-
-\- Policy evaluation principles
-
-\- Computation of optimal policy
+- Value iteration algorithm
+- Policy evaluation principles
+- Computation of optimal policy
 
 
 
@@ -268,15 +253,12 @@ They operated well in deterministic environment because transitions were known i
 
 
 
-\---
+---
 
 
 
 
-
-
-
-Reinforcement Learning Strategies (V2)
+### Reinforcement Learning Strategies (V2)
 
 
 
@@ -288,15 +270,15 @@ Included:
 
 
 
-\- Q-Learning
+- Q-Learning
 
-\- SARSA
+- SARSA
 
-\- Temporal Difference methods
+- Temporal Difference methods
 
-\- Monte Carlo methods
+- Monte Carlo methods
 
-\- Deep Q-Networks (DQN)
+- Deep Q-Networks (DQN)
 
 
 
@@ -308,7 +290,7 @@ The agent did not solve the environment anymore, but had to explore, make errors
 
 
 
-\---
+---
 
 
 
@@ -316,7 +298,8 @@ The agent did not solve the environment anymore, but had to explore, make errors
 
 
 
-Optimization and Evaluation Techniques (V3)
+### Optimization and Evaluation Techniques (V3)
+
 
 
 
@@ -328,25 +311,25 @@ Uncertainty of repeated experiments revealed the randomness of their results. It
 
 
 
-* Random hyperparameter optimization
-* Experiment logging
-* Performance measurement
-* Iterative evaluation runs
-* Visualization of result(s)
+- Random hyperparameter optimization
+- Experiment logging
+- Performance measurement
+- Iterative evaluation runs
+- Visualization of results
 
 This transformed the workflow from:
 
 
 
+```text
 train once
-
-&#x20;     ↓
-
+     ↓
 observe result
+```
 
 
 
-So what are the Key Findings/Results?
+## Key Findings
 
 
 
@@ -399,8 +382,9 @@ However, none of the configurations proved optimal in each and every test case.
 This finding is important since, rather than leading towards a conclusion regarding a single optimal hyperparameter setting, this result reiterates the necessity of running multiple tests instead of just one or two runs.
 
 
+---
 
-Conclusion
+## Conclusion
 
 
 
@@ -442,9 +426,9 @@ It was never the goal to develop an agent capable of reaching a goal state.
 
 Rather, it was about seeing how systems would behave under increased complexity, randomness, and unpredictable situations.
 
+---
 
-
-\## Project Structure
+## Project Structure
 
 
 
@@ -470,15 +454,22 @@ rl-capstone-gridworld/
 
 │   ├── environment/
 
+│   ├── models/
+
+│   ├── replay_buffer/
+
 │   ├── evaluation/
 
 │   ├── tuning/
 
-│   ├── visualization/
+│   ├── utils/
 
-│   └── train\_v3.py
+│   └── train_v3.py
 
 │
 
-└── README\_v3.md
+└── README_v3.md
+
+```
+
 

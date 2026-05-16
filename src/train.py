@@ -63,7 +63,7 @@ print(f"  θ (threshold): {THETA}")
 print(f"  Adversary start: {ADVERSARY_START}\n")
 
 # Create environment
-env = PursuitEvasionEnv(grid_size=GRID_SIZE, goal_state=(4,4), adversary_start=ADVERSARY_START)
+env = PursuitEvasionEnv(grid_size=GRID_SIZE, goal=(4,4), adversary_start=ADVERSARY_START)
 
 print(f"Environment: Pursuit-Evasion GridWorld")
 print(f"Agent goal: {env.goal}")
